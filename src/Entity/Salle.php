@@ -3,7 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\SalleRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: SalleRepository::class)]
@@ -20,6 +22,9 @@ class Salle
 
     #[ORM\Column]
     private int $capacite;
+
+    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'salle')]
+    private Collection $reservations;
 
     public function getId(): ?Uuid
     {
@@ -46,5 +51,15 @@ class Salle
     {
         $this->capacite = $capacite;
         return $this;
+    }
+
+    public function __construct()
+    {
+        $this->reservations = new ArrayCollection();
+    }
+
+    public function getReservations(): Collection
+    {
+        return $this->reservations;
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\AvisRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
@@ -19,29 +18,27 @@ class Avis
     #[ORM\Column]
     private int $note;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $commentaire = null;
-
-    #[ORM\Column]
-    private \DateTimeImmutable $createdAt;
-
-    #[ORM\Column]
-    private \DateTimeImmutable $updatedAt;
 
     #[ORM\Column]
     private bool $accepte = false;
 
-    #[ORM\ManyToOne(inversedBy: 'avisRediges')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $auteur = null;
-
-    #[ORM\ManyToOne(inversedBy: 'avisModeres')]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?User $moderateur = null;
+    #[ORM\Column]
+    private \DateTimeImmutable $createdAt;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Evenement $evenement = null;
+    private User $auteur;
+
+    #[ORM\ManyToOne(inversedBy: 'avis')]
+    #[ORM\JoinColumn(nullable: false)]
+    private Evenement $evenement;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?Uuid
     {
@@ -70,28 +67,6 @@ class Avis
         return $this;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    public function getUpdatedAt(): \DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
     public function isAccepte(): bool
     {
         return $this->accepte;
@@ -103,34 +78,28 @@ class Avis
         return $this;
     }
 
-    public function getAuteur(): ?User
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getAuteur(): User
     {
         return $this->auteur;
     }
 
-    public function setAuteur(?User $auteur): static
+    public function setAuteur(User $auteur): static
     {
         $this->auteur = $auteur;
         return $this;
     }
 
-    public function getModerateur(): ?User
-    {
-        return $this->moderateur;
-    }
-
-    public function setModerateur(?User $moderateur): static
-    {
-        $this->moderateur = $moderateur;
-        return $this;
-    }
-
-    public function getEvenement(): ?Evenement
+    public function getEvenement(): Evenement
     {
         return $this->evenement;
     }
 
-    public function setEvenement(?Evenement $evenement): static
+    public function setEvenement(Evenement $evenement): static
     {
         $this->evenement = $evenement;
         return $this;

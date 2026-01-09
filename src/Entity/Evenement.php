@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
+use App\Entity\Reservation;
 
 #[ORM\Entity(repositoryClass: EvenementRepository::class)]
 class Evenement
@@ -20,9 +21,6 @@ class Evenement
     #[ORM\Column(length: 255)]
     private string $titre;
 
-    #[ORM\Column]
-    private \DateTimeImmutable $dateEvenement;
-
     #[ORM\ManyToOne(inversedBy: 'evenements')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $responsable = null;
@@ -32,13 +30,17 @@ class Evenement
     private Collection $participations;
 
     /** @var Collection<int, Avis> */
-    #[ORM\OneToMany(mappedBy: 'evenement', targetEntity: Avis::class)]
+    #[ORM\OneToMany(mappedBy: 'evenement', targetEntity: Avis::class, orphanRemoval: true)]
     private Collection $avis;
+
+    #[ORM\OneToMany(mappedBy: 'evenement', targetEntity: Reservation::class)]
+    private Collection $reservations;
 
     public function __construct()
     {
         $this->participations = new ArrayCollection();
         $this->avis = new ArrayCollection();
+        $this->reservations = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -57,17 +59,6 @@ class Evenement
         return $this;
     }
 
-    public function getDateEvenement(): \DateTimeImmutable
-    {
-        return $this->dateEvenement;
-    }
-
-    public function setDateEvenement(\DateTimeImmutable $dateEvenement): static
-    {
-        $this->dateEvenement = $dateEvenement;
-        return $this;
-    }
-
     public function getResponsable(): ?User
     {
         return $this->responsable;
@@ -76,6 +67,40 @@ class Evenement
     public function setResponsable(User $responsable): static
     {
         $this->responsable = $responsable;
+        return $this;
+    }
+
+    public function getReservations(): Collection
+    {
+        return $this->reservations;
+    }
+
+    /**
+     * @return Collection<int, Avis>
+     */
+    public function getAvis(): Collection
+    {
+        return $this->avis;
+    }
+
+    public function addAvi(Avis $avis): static
+    {
+        if (!$this->avis->contains($avis)) {
+            $this->avis->add($avis);
+            $avis->setEvenement($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAvi(Avis $avis): static
+    {
+        if ($this->avis->removeElement($avis)) {
+            if ($avis->getEvenement() === $this) {
+                $avis->setEvenement(null);
+            }
+        }
+
         return $this;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Reservation;
+use App\Entity\Salle;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -15,6 +16,24 @@ class ReservationRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Reservation::class);
     }
+
+    public function isSalleDisponible(
+        Salle $salle,
+        \DateTimeInterface $dateDebut,
+        \DateTimeInterface $dateFin
+    ): bool {
+        $qb = $this->createQueryBuilder('r');
+        $qb->select('COUNT(r.id)')
+            ->where('IDENTITY(r.salle) = :salleId')
+            ->andWhere('r.dateDebut < :dateFin')
+            ->andWhere('r.dateFin > :dateDebut')
+            ->setParameter('salleId', $salle->getId()->toBinary())
+            ->setParameter('dateDebut', $dateDebut)
+            ->setParameter('dateFin', $dateFin);
+
+        return (int) $qb->getQuery()->getSingleScalarResult() === 0;
+    }
+
 
     //    /**
     //     * @return Reservation[] Returns an array of Reservation objects

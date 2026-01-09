@@ -8,19 +8,41 @@
     <table class="table">
         <tbody>
             <tr>
-                <th>Id</th>
-                <td>{{ evenement.id }}</td>
-            </tr>
-            <tr>
                 <th>Titre</th>
                 <td>{{ evenement.titre }}</td>
             </tr>
             <tr>
                 <th>DateEvenement</th>
-                <td>{{ evenement.dateEvenement ? evenement.dateEvenement|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    {% set reservation = evenement.reservations|first %}
+                    {% if reservation %}
+                        {{ reservation.dateDebut|date('Y-m-d H:i') }}
+                        →
+                        {{ reservation.dateFin|date('Y-m-d H:i') }}
+                    {% endif %}
+                </td>
             </tr>
         </tbody>
     </table>
+
+    {% if app.user and evenement.responsable != app.user %}
+        <a href="{{ path('app_avis_new', { id: evenement.id }) }}">
+            Donner un avis
+        </a>
+    {% endif %}
+
+    <h3>Avis</h3>
+
+    {% for avis in avis %}
+        {% if avis.accepte %}
+            <p>
+                ⭐ {{ avis.note }}/5<br>
+                {{ avis.commentaire }}
+            </p>
+        {% endif %}
+    {% else %}
+        <p>Aucun avis pour le moment.</p>
+    {% endfor %}
 
     <a href="{{ path('app_evenement_index') }}">back to list</a>
 

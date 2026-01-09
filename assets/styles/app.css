@@ -1,3 +1,23 @@
 body {
     background-color: skyblue;
 }
+
+.flash {
+    padding: 12px;
+    margin: 10px auto;
+    width: 90%;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.flash-success {
+    background-color: #e6fffa;
+    color: #065f46;
+    border: 1px solid #10b981;
+}
+
+.flash-error {
+    background-color: #fee2e2;
+    color: #7f1d1d;
+    border: 1px solid #ef4444;
+}

@@ -29,13 +29,24 @@ class Reservation
     #[ORM\JoinColumn(nullable: false)]
     private ?Evenement $evenement = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Salle $salle = null;
 
     public function getId(): ?Uuid
     {
         return $this->id;
+    }
+
+    public function getUtilisateur(): ?User
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(User $utilisateur): static
+    {
+        $this->utilisateur = $utilisateur;
+        return $this;
     }
 
     public function getDateDebut(): \DateTimeImmutable
@@ -57,6 +68,28 @@ class Reservation
     public function setDateFin(\DateTimeImmutable $dateFin): static
     {
         $this->dateFin = $dateFin;
+        return $this;
+    }
+
+    public function getSalle(): ?Salle
+    {
+        return $this->salle;
+    }
+
+    public function setSalle(Salle $salle): static
+    {
+        $this->salle = $salle;
+        return $this;
+    }
+
+    public function getEvenement(): ?Evenement
+    {
+        return $this->evenement;
+    }
+
+    public function setEvenement(Evenement $evenement): static
+    {
+        $this->evenement = $evenement;
         return $this;
     }
 }
